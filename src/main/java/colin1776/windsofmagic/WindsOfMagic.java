@@ -22,6 +22,7 @@ public class WindsOfMagic
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
 
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new EventHandler());
 
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         Spells.register(bus);

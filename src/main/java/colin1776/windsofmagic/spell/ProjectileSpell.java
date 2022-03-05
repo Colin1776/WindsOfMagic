@@ -8,14 +8,14 @@ public class ProjectileSpell<T extends AbstractMagicProjectile> extends Spell
 {
     private final T projectile;
 
-    public ProjectileSpell(Lore lore, SpellType type, T projectile, int baseCooldown, int baseWindup, int baseRange, boolean isContinuous)
+    public ProjectileSpell(String name, Lore lore, Tier tier, SpellType type, T projectile, int baseCost, int baseCooldown, int windup, int baseRange)
     {
-        super(lore, type, baseCooldown, baseWindup, baseRange, isContinuous);
+        super(name, lore, tier, type, baseCooldown, baseCost, windup, baseRange, false);
         this.projectile = projectile;
     }
 
     @Override
-    public boolean cast(LivingEntity caster, ItemStack castingItem)
+    public boolean cast(LivingEntity caster, ItemStack castingItem, int ticksInCast)
     {
         return false;
     }
