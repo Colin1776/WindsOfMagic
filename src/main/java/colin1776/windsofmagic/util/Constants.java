@@ -9,4 +9,6 @@ public class Constants
     public static final int MAX_WINDS_PER_TICK = 10;
     public static final int MAX_COST_INCREASE = -100;
     public static final int MAX_COST_REDUCTION = 100;
+    public static final int MAX_COOLDOWN_INCREASE = -600;
+    public static final int MAX_COOLDOWN_REDUCTION = 600;
 }

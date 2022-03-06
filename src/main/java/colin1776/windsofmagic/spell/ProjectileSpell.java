@@ -4,6 +4,7 @@ import colin1776.windsofmagic.projectile.AbstractMagicProjectile;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
+@SuppressWarnings("unused")
 public class ProjectileSpell<T extends AbstractMagicProjectile> extends Spell
 {
     private final T projectile;
@@ -18,6 +19,11 @@ public class ProjectileSpell<T extends AbstractMagicProjectile> extends Spell
     public boolean cast(LivingEntity caster, ItemStack castingItem, int ticksInCast)
     {
         return false;
+    }
+
+    public T getProjectile()
+    {
+        return projectile;
     }
 }
 

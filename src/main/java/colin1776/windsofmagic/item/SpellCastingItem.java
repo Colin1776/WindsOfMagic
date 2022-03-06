@@ -29,6 +29,9 @@ public class SpellCastingItem extends Item
     private final Tier tier;
     private final Lore lore;
 
+    // TODO handle non continuous spells and spells that have start ups
+    // TODO reorganize and cleanup
+
     public SpellCastingItem(Properties pProperties, Tier tier, Lore lore)
     {
         super(pProperties);
@@ -76,9 +79,7 @@ public class SpellCastingItem extends Item
                 MagicItemData.addSpell(castingItem, Spells.SECOND.get(), 1);
                 MagicItemData.addSpell(castingItem, Spells.FIREBALL.get(), 3);
 
-                MagicItemData.addCooldown(castingItem, 0, 20);
-                MagicItemData.addCooldown(castingItem, 1, 20);
-                MagicItemData.addCooldown(castingItem, 3, 20);
+                MagicItemData.addCooldown(castingItem, 0, 0);
 
                 System.out.println("Reset spells/cooldowns");
             }
@@ -106,6 +107,8 @@ public class SpellCastingItem extends Item
     @Override
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected)
     {
+        MagicItemData.decrementCooldowns(pStack);
+
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
     }
 
@@ -127,7 +130,8 @@ public class SpellCastingItem extends Item
             int cost = MagicEntityData.getFinalCost(caster, spell);
             MagicEntityData.subtractWinds(caster, cost);
 
-            // TODO add cooldown
+            int cooldown = MagicEntityData.getFinalCooldown(caster, spell);
+            MagicItemData.addCooldown(stack, MagicItemData.getCurrentSpellIndex(stack), cooldown);
         }
     }
 

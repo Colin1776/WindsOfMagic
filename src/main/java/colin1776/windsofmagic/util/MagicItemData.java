@@ -2,20 +2,21 @@ package colin1776.windsofmagic.util;
 
 import colin1776.windsofmagic.init.Spells;
 import colin1776.windsofmagic.item.SpellCastingItem;
+import colin1776.windsofmagic.spell.Lore;
 import colin1776.windsofmagic.spell.Spell;
 import colin1776.windsofmagic.spell.Tier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
+@SuppressWarnings("unused")
 public class MagicItemData
 {
     private static final String SPELL_SLOT = "spellslot";
     private static final String CURRENT_SPELL = "currentspell";
     private static final String COOLDOWNS = "cooldowns";
 
-    // TODO restrict addition of spells based on Tier and Lore
-    // TODO allow the current spell to be in an "empty" slot
-    // TODO add setSpells and setCooldowns methods that get called by addSpell and addCooldown
+    // TODO clean this up at a later time
+
 
     // SPELLS
     public static Spell[] getSpells(ItemStack stack)
@@ -50,6 +51,11 @@ public class MagicItemData
         if (stack.getItem() instanceof SpellCastingItem item)
         {
             Tier tier = item.getTier();
+            Lore lore = item.getLore();
+
+            if (tier != spell.getTier()) return;
+            if (lore != spell.getLore()) return;
+
             int numberOfSpells = tier.getNumber();
 
             if (index >= 0 && index < numberOfSpells)
@@ -193,6 +199,7 @@ public class MagicItemData
         return null;
     }
 
+    @SuppressWarnings("ManualArrayCopy")
     public static void addCooldown(ItemStack stack, int index, int cooldownAmount)
     {
         if (stack.getItem() instanceof SpellCastingItem item)
@@ -237,7 +244,10 @@ public class MagicItemData
             }
             else
             {
-                tag.putIntArray(COOLDOWNS, new int[numberOfCooldowns]);
+                int[] newCooldowns = new int[numberOfCooldowns];
+                newCooldowns[index] = cooldownAmount;
+
+                tag.putIntArray(COOLDOWNS, newCooldowns);
             }
         }
     }

@@ -5,14 +5,16 @@ import colin1776.windsofmagic.spell.Spell;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 
+@SuppressWarnings("unused")
 public class MagicEntityData
 {
     private static final String WINDS = "winds";
     private static final String CAPACITY = "capacity";
     private static final String RECHARGE = "recharge";
     private static final String COST = "cost";
+    private static final String COOLDOWN = "cooldown";
 
-    // TODO add cooldown reduction system
+    // TODO bit of cleanup for consistency and add javadocs
 
     public static int getWinds(LivingEntity entity)
     {
@@ -203,4 +205,87 @@ public class MagicEntityData
 
         return Math.max(reducedCost, 1);
     }
+
+    public static int getCooldownReduction(LivingEntity entity)
+    {
+        CompoundTag tag = entity.getPersistentData();
+
+        if (tag.contains(COOLDOWN))
+            return tag.getInt(COOLDOWN);
+
+        return 0;
+    }
+
+    public static void setCooldownReduction(LivingEntity entity, int cooldown)
+    {
+        if (cooldown > Constants.MAX_COOLDOWN_REDUCTION)
+            cooldown = Constants.MAX_COOLDOWN_REDUCTION;
+        else if (cooldown < Constants.MAX_COOLDOWN_INCREASE)
+            cooldown = Constants.MAX_COOLDOWN_INCREASE;
+
+        CompoundTag tag = entity.getPersistentData();
+        tag.putInt(COOLDOWN, cooldown);
+    }
+
+    public static void reduceCooldown(LivingEntity entity, int amount)
+    {
+        int cooldown = getCooldownReduction(entity);
+        setCooldownReduction(entity, cooldown + amount);
+    }
+
+    public static void increaseCooldown(LivingEntity entity, int amount)
+    {
+        int cooldown = getCooldownReduction(entity);
+        setCooldownReduction(entity, cooldown - amount);
+    }
+
+    public static int getLoreCooldownReduction(LivingEntity entity, Lore lore)
+    {
+        CompoundTag tag = entity.getPersistentData();
+        String key = COOLDOWN + lore.toString();
+
+        if (tag.contains(key))
+            return tag.getInt(key);
+
+        return 0;
+    }
+
+    public static void setLoreCooldownReduction(LivingEntity entity, Lore lore, int cooldown)
+    {
+        if (cooldown > Constants.MAX_COOLDOWN_REDUCTION)
+            cooldown = Constants.MAX_COOLDOWN_REDUCTION;
+        else if (cooldown < Constants.MAX_COOLDOWN_INCREASE)
+            cooldown = Constants.MAX_COOLDOWN_INCREASE;
+
+        CompoundTag tag = entity.getPersistentData();
+        String key = COOLDOWN + lore.toString();
+        tag.putInt(key, cooldown);
+    }
+
+    public static void reduceLoreCooldown(LivingEntity entity, Lore lore, int amount)
+    {
+        int cooldown = getLoreCooldownReduction(entity, lore);
+        setLoreCooldownReduction(entity, lore, cooldown + amount);
+    }
+
+    public static void increaseLoreCooldown(LivingEntity entity, Lore lore, int amount)
+    {
+        int cooldown = getLoreCooldownReduction(entity, lore);
+        setLoreCooldownReduction(entity, lore, cooldown - amount);
+    }
+
+    public static int getFinalCooldown(LivingEntity entity, Spell spell)
+    {
+        Lore lore = spell.getLore();
+
+        int baseCooldown = spell.getBaseCooldown();
+
+        int cooldownReduction = getCooldownReduction(entity);
+        int loreCooldownReduction = getLoreCooldownReduction(entity, lore);
+
+        int reducedCooldown = baseCooldown - (cooldownReduction + loreCooldownReduction);
+
+        return Math.max(reducedCooldown, 1);
+    }
+
 }
