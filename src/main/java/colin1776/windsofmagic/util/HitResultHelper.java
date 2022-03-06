@@ -7,7 +7,7 @@ public class HitResultHelper
 {
     public static HitResult result(LivingEntity entity, int range)
     {
-        HitResult result = null;
+        HitResult result;
 
         result = entity.pick(range, 0.0F, false);
 

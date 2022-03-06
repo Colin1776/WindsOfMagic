@@ -5,6 +5,7 @@ import colin1776.windsofmagic.spell.Lore;
 import colin1776.windsofmagic.spell.Spell;
 import colin1776.windsofmagic.spell.Tier;
 import colin1776.windsofmagic.util.KeyboardHelper;
+import colin1776.windsofmagic.util.MagicEntityData;
 import colin1776.windsofmagic.util.MagicItemData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -12,6 +13,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+@SuppressWarnings("NullableProblems")
 public class SpellCastingItem extends Item
 {
     private final Tier tier;
@@ -83,7 +86,17 @@ public class SpellCastingItem extends Item
             {
                 Spell spell = MagicItemData.getCurrentSpell(castingItem);
 
-                spell.cast(pPlayer, castingItem, 0);
+                if (spell != null)
+                {
+                    if (canCast(pPlayer, castingItem, spell))
+                    {
+                        boolean isContinuous = spell.isContinuous();
+                        boolean hasWindup = spell.getWindup() > 0;
+
+                        if (!hasWindup && !isContinuous)
+                            cast(pPlayer, castingItem, spell, 0);
+                    }
+                }
             }
         }
 
@@ -94,6 +107,28 @@ public class SpellCastingItem extends Item
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected)
     {
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
+    }
+
+    @SuppressWarnings("RedundantIfStatement")
+    private boolean canCast(LivingEntity caster, ItemStack stack, Spell spell)
+    {
+        if (MagicItemData.getCurrentCooldown(stack) > 0) return false;
+
+        if (MagicEntityData.getFinalCost(caster, spell) > MagicEntityData.getWinds(caster)) return false;
+
+        return true;
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private void cast(LivingEntity caster, ItemStack stack, Spell spell, int castingTick)
+    {
+        if (spell.cast(caster, stack, castingTick))
+        {
+            int cost = MagicEntityData.getFinalCost(caster, spell);
+            MagicEntityData.subtractWinds(caster, cost);
+
+            // TODO add cooldown
+        }
     }
 
     public Tier getTier()

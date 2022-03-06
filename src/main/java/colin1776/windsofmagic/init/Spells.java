@@ -9,6 +9,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class Spells
@@ -40,6 +41,6 @@ public class Spells
 
     public static String getKeyFromSpell(Spell spell)
     {
-        return getSpellRegistry().getKey(spell).toString();
+        return Objects.requireNonNull(getSpellRegistry().getKey(spell)).toString();
     }
 }

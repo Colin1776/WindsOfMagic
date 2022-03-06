@@ -1,5 +1,6 @@
 package colin1776.windsofmagic.spell;
 
+@SuppressWarnings("unused")
 public enum Lore
 {
     FIRE("fire"),

@@ -1,5 +1,6 @@
 package colin1776.windsofmagic.spell;
 
+@SuppressWarnings("unused")
 public enum Tier
 {
     BEGINNER("Beginner", 4),
@@ -15,7 +16,7 @@ public enum Tier
         this.number = number;
     }
 
-    public int getNumberOfSpells()
+    public int getNumber()
     {
         return number;
     }

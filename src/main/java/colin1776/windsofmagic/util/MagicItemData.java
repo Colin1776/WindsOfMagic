@@ -13,13 +13,17 @@ public class MagicItemData
     private static final String CURRENT_SPELL = "currentspell";
     private static final String COOLDOWNS = "cooldowns";
 
+    // TODO restrict addition of spells based on Tier and Lore
+    // TODO allow the current spell to be in an "empty" slot
+    // TODO add setSpells and setCooldowns methods that get called by addSpell and addCooldown
+
     // SPELLS
     public static Spell[] getSpells(ItemStack stack)
     {
         if (stack.getItem() instanceof SpellCastingItem item)
         {
             Tier tier = item.getTier();
-            int numberOfSpells = tier.getNumberOfSpells();
+            int numberOfSpells = tier.getNumber();
 
             CompoundTag tag = stack.getOrCreateTag();
             Spell[] spells = new Spell[numberOfSpells];
@@ -46,7 +50,7 @@ public class MagicItemData
         if (stack.getItem() instanceof SpellCastingItem item)
         {
             Tier tier = item.getTier();
-            int numberOfSpells = tier.getNumberOfSpells();
+            int numberOfSpells = tier.getNumber();
 
             if (index >= 0 && index < numberOfSpells)
             {
@@ -194,7 +198,7 @@ public class MagicItemData
         if (stack.getItem() instanceof SpellCastingItem item)
         {
             Tier tier = item.getTier();
-            int numberOfCooldowns = tier.getNumberOfSpells();
+            int numberOfCooldowns = tier.getNumber();
 
             if (index < 0 || index > numberOfCooldowns - 1) return;
 

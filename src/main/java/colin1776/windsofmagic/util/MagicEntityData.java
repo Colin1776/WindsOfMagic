@@ -1,6 +1,7 @@
 package colin1776.windsofmagic.util;
 
 import colin1776.windsofmagic.spell.Lore;
+import colin1776.windsofmagic.spell.Spell;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -10,6 +11,8 @@ public class MagicEntityData
     private static final String CAPACITY = "capacity";
     private static final String RECHARGE = "recharge";
     private static final String COST = "cost";
+
+    // TODO add cooldown reduction system
 
     public static int getWinds(LivingEntity entity)
     {
@@ -185,5 +188,19 @@ public class MagicEntityData
     {
         int cost = getLoreCostReduction(entity, lore);
         setLoreCostReduction(entity, lore, cost - amount);
+    }
+
+    public static int getFinalCost(LivingEntity entity, Spell spell)
+    {
+        Lore lore = spell.getLore();
+
+        int baseCost = spell.getBaseCost();
+
+        int costReduction = getCostReduction(entity);
+        int loreCostReduction = getLoreCostReduction(entity, lore);
+
+        int reducedCost = baseCost - (costReduction + loreCostReduction);
+
+        return Math.max(reducedCost, 1);
     }
 }
