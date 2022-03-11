@@ -5,7 +5,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class FireballSpell extends Spell
 {
-    public FireballSpell(String name, Lore lore, Tier tier, SpellType type, int baseCost, int baseCooldown, int windup, int range, boolean isContinuous)
+    public FireballSpell(String name, Lore lore, Tier tier, Type type, int baseCost, int baseCooldown, int windup, int range, boolean isContinuous)
     {
         super(name, lore, tier, type, baseCost, baseCooldown, windup, range, isContinuous);
     }

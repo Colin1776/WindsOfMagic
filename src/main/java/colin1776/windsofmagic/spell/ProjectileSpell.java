@@ -9,7 +9,7 @@ public class ProjectileSpell<T extends AbstractMagicProjectile> extends Spell
 {
     private final T projectile;
 
-    public ProjectileSpell(String name, Lore lore, Tier tier, SpellType type, T projectile, int baseCost, int baseCooldown, int windup, int baseRange)
+    public ProjectileSpell(String name, Lore lore, Tier tier, Type type, T projectile, int baseCost, int baseCooldown, int windup, int baseRange)
     {
         super(name, lore, tier, type, baseCooldown, baseCost, windup, baseRange, false);
         this.projectile = projectile;

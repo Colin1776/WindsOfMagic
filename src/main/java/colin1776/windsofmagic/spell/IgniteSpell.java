@@ -13,7 +13,7 @@ public class IgniteSpell extends Spell
 {
     public IgniteSpell()
     {
-        super("Ignite", Lore.FIRE, Tier.BEGINNER, SpellType.UTILITY, 80, 50, 0, 8, false);
+        super("Ignite", Lore.FIRE, Tier.BEGINNER, Type.UTILITY, 80, 50, 0, 8, true);
     }
 
     // TODO set blocks on fire, light campfires and candles, etc if the cast will be successful, look at FlintAndSteelItem, maybe add some fire particles

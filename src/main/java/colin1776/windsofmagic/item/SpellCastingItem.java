@@ -29,7 +29,7 @@ public class SpellCastingItem extends Item
     private final Tier tier;
     private final Lore lore;
 
-    // TODO handle non continuous spells and spells that have start ups
+    // TODO complete handling for continuous and windup spells
     // TODO reorganize and cleanup
 
     public SpellCastingItem(Properties pProperties, Tier tier, Lore lore)
@@ -89,19 +89,90 @@ public class SpellCastingItem extends Item
 
                 if (spell != null)
                 {
-                    if (canCast(pPlayer, castingItem, spell))
-                    {
+                    if (canCast(pPlayer, castingItem, spell)) {
                         boolean isContinuous = spell.isContinuous();
                         boolean hasWindup = spell.getWindup() > 0;
 
                         if (!hasWindup && !isContinuous)
-                            cast(pPlayer, castingItem, spell, 0);
+                        {
+                            if (spell.cast(pPlayer, castingItem, 0))
+                            {
+                                doPostCast(pPlayer, castingItem, spell, 0);
+                            }
+                        }
+                        else if (!hasWindup)
+                        {
+                            pPlayer.startUsingItem(pUsedHand);
+                            return InteractionResultHolder.consume(castingItem);
+                        }
                     }
                 }
             }
         }
 
         return super.use(pLevel, pPlayer, pUsedHand);
+    }
+
+    @Override
+    public void onUseTick(Level pLevel, LivingEntity pLivingEntity, ItemStack pStack, int pRemainingUseDuration)
+    {
+        Spell spell = MagicItemData.getCurrentSpell(pStack);
+
+        if (spell != null)
+        {
+            boolean hasWindup = spell.getWindup() > 0;
+            boolean isContinuous = spell.isContinuous();
+
+            int tick = 72000 - pRemainingUseDuration;
+
+            if (hasWindup)
+            {
+                int windup = spell.getWindup();
+
+
+                if (tick >= windup)
+                {
+                    if (canCast(pLivingEntity, pStack, spell))
+                    {
+                        spell.cast(pLivingEntity, pStack, tick);
+                    }
+
+                    if (!isContinuous)
+                    {
+                        pLivingEntity.stopUsingItem();
+                    }
+                }
+
+            }
+            else
+            {
+                if (canCast(pLivingEntity, pStack, spell))
+                    spell.cast(pLivingEntity, pStack, tick);
+            }
+        }
+
+        super.onUseTick(pLevel, pLivingEntity, pStack, pRemainingUseDuration);
+    }
+
+    @Override
+    public void releaseUsing(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity, int pTimeCharged)
+    {
+        Spell spell = MagicItemData.getCurrentSpell(pStack);
+
+        if (spell != null)
+        {
+            int tick = 72000 - pTimeCharged;
+
+            doPostCast(pLivingEntity, pStack, spell, tick);
+        }
+
+        super.releaseUsing(pStack, pLevel, pLivingEntity, pTimeCharged);
+    }
+
+    @Override
+    public int getUseDuration(ItemStack pStack)
+    {
+        return 72000;
     }
 
     @Override
@@ -122,8 +193,7 @@ public class SpellCastingItem extends Item
         return true;
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private void cast(LivingEntity caster, ItemStack stack, Spell spell, int castingTick)
+    private void doPostCast(LivingEntity caster, ItemStack stack, Spell spell, int castingTick)
     {
         if (spell.cast(caster, stack, castingTick))
         {

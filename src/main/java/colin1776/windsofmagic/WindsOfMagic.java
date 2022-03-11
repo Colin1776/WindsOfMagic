@@ -2,6 +2,7 @@ package colin1776.windsofmagic;
 
 import colin1776.windsofmagic.init.ModItems;
 import colin1776.windsofmagic.init.Spells;
+import colin1776.windsofmagic.network.NetworkHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -21,6 +22,8 @@ public class WindsOfMagic
         MinecraftForge.EVENT_BUS.register(new EventHandler());
 
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        NetworkHandler.init();
         Spells.register(bus);
         ModItems.register(bus);
     }

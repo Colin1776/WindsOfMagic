@@ -10,7 +10,7 @@ public abstract class Spell extends ForgeRegistryEntry<Spell>
     private final String name;
     private final Lore lore;
     private final Tier tier;
-    private final SpellType type;
+    private final Type type;
     private final int baseCost;
     private final int baseCooldown;
     private final int windup;
@@ -19,7 +19,7 @@ public abstract class Spell extends ForgeRegistryEntry<Spell>
 
 
     /* -------------------------------- CONSTRUCTORS --------------------------------*/
-    public Spell(String name, Lore lore, Tier tier, SpellType type, int baseCost, int baseCooldown, int windup, int range, boolean isContinuous)
+    public Spell(String name, Lore lore, Tier tier, Type type, int baseCost, int baseCooldown, int windup, int range, boolean isContinuous)
     {
         this.name = name;
         this.lore = lore;
@@ -54,7 +54,7 @@ public abstract class Spell extends ForgeRegistryEntry<Spell>
         return tier;
     }
 
-    public SpellType getType()
+    public Type getType()
     {
         return type;
     }

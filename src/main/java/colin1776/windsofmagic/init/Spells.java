@@ -19,8 +19,8 @@ public class Spells
     private static final Supplier<IForgeRegistry<Spell>> REGISTRY = SPELLS.makeRegistry("spell_registry", RegistryBuilder::new);
 
     public static final RegistryObject<Spell> IGNITE = SPELLS.register("ignite", IgniteSpell::new);
-    public static final RegistryObject<Spell> FIREBALL = SPELLS.register("fireball", () -> new FireballSpell("Fireball", Lore.FIRE, Tier.BEGINNER, SpellType.PROJECTILE, 5, 10, 0, 10, false));
-    public static final RegistryObject<Spell> SECOND = SPELLS.register("second", () -> new FireballSpell("Second", Lore.FIRE, Tier.BEGINNER, SpellType.PROJECTILE, 5, 10, 0, 10, false));
+    public static final RegistryObject<Spell> FIREBALL = SPELLS.register("fireball", () -> new FireballSpell("Fireball", Lore.FIRE, Tier.BEGINNER, Type.PROJECTILE, 5, 10, 0, 10, false));
+    public static final RegistryObject<Spell> SECOND = SPELLS.register("second", () -> new FireballSpell("Second", Lore.FIRE, Tier.BEGINNER, Type.PROJECTILE, 5, 10, 0, 10, false));
 
     public static void register(IEventBus bus)
     {
