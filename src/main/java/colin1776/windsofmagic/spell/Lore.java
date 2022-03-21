@@ -3,6 +3,7 @@ package colin1776.windsofmagic.spell;
 @SuppressWarnings("unused")
 public enum Lore
 {
+    NONE("none"),
     FIRE("fire"),
     ICE("ice"),
     HEAVENS("heavens"),

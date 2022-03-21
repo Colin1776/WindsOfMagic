@@ -1,218 +1,60 @@
 package colin1776.windsofmagic.item;
 
-import colin1776.windsofmagic.init.Spells;
 import colin1776.windsofmagic.spell.Lore;
 import colin1776.windsofmagic.spell.Spell;
 import colin1776.windsofmagic.spell.Tier;
-import colin1776.windsofmagic.util.KeyboardHelper;
-import colin1776.windsofmagic.util.MagicEntityData;
-import colin1776.windsofmagic.util.MagicItemData;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
-@SuppressWarnings("NullableProblems")
-public class SpellCastingItem extends Item
+public interface SpellCastingItem
 {
-    private final Tier tier;
-    private final Lore lore;
+    // TODO finish javadocs and add any more necessary methods
 
-    // TODO complete handling for continuous and windup spells
-    // TODO reorganize and cleanup
+    /**
+     * The {@link colin1776.windsofmagic.spell.Tier} determines whether a
+     * {@link colin1776.windsofmagic.spell.Spell} can be bound to the item
+     * as well as the max number of spells that can be bound.
+     * @return the {@link colin1776.windsofmagic.spell.Tier} of the item.
+     */
+    Tier getTier();
 
-    public SpellCastingItem(Properties pProperties, Tier tier, Lore lore)
-    {
-        super(pProperties);
-        this.tier = tier;
-        this.lore = lore;
-    }
+    Lore getLore();
 
-    @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced)
-    {
-        Spell[] spells = MagicItemData.getSpells(pStack);
-        int[] cooldowns = MagicItemData.getCooldowns(pStack);
+    /**
+     * This is usually determined by the {@link colin1776.windsofmagic.spell.Tier}
+     * of the item.
+     * @return the number of spells that can be bound to the item.
+     */
+    int maxNumberOfSpells();
 
-        if (spells != null && cooldowns != null)
-        {
-            String s;
+    Spell[] getSpells(ItemStack stack);
 
-            for (int i = 0; i < spells.length; i++)
-            {
-                s = spells[i] + ": " + cooldowns[i];
+    Spell getCurrentSpell(ItemStack stack);
 
-                ChatFormatting formatting = ChatFormatting.BLUE;
+    void selectSpell(ItemStack stack, int index);
 
-                if (i == MagicItemData.getCurrentSpellIndex(pStack))
-                    formatting = ChatFormatting.GOLD;
+    void selectNextSpell(ItemStack stack);
 
-                pTooltipComponents.add(new TextComponent(s).withStyle(formatting));
-            }
-        }
+    void selectPreviousSpell(ItemStack stack);
 
+    /**
+     * Binds a {@link colin1776.windsofmagic.spell.Spell} to the item.
+     * @param stack the item the spell is binding to.
+     * @param spell the spell that is being bound.
+     * @param index the slot being bound to.
+     * @return true if the spell was bound to the given slot.
+     */
+    boolean setSpell(ItemStack stack, Spell spell, int index);
 
-        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
-    }
+    int[] getCooldowns(ItemStack stack);
 
-    @Override
-    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand)
-    {
-        if (!pLevel.isClientSide())
-        {
-            ItemStack castingItem = pPlayer.getItemInHand(pUsedHand);
+    int getCurrentCooldown(ItemStack stack);
 
-            if (KeyboardHelper.isHoldingShift())
-            {
-                MagicItemData.addSpell(castingItem, Spells.IGNITE.get(), 0);
-                MagicItemData.addSpell(castingItem, Spells.SECOND.get(), 1);
-                MagicItemData.addSpell(castingItem, Spells.FIREBALL.get(), 3);
+    void setCurrentCooldown(ItemStack stack, int cooldown);
 
-                MagicItemData.addCooldown(castingItem, 0, 0);
+    void decrementCooldowns(ItemStack stack);
 
-                System.out.println("Reset spells/cooldowns");
-            }
-            else
-            {
-                Spell spell = MagicItemData.getCurrentSpell(castingItem);
+    boolean canCast(LivingEntity caster, ItemStack stack, Spell spell);
 
-                if (spell != null)
-                {
-                    if (canCast(pPlayer, castingItem, spell)) {
-                        boolean isContinuous = spell.isContinuous();
-                        boolean hasWindup = spell.getWindup() > 0;
-
-                        if (!hasWindup && !isContinuous)
-                        {
-                            if (spell.cast(pPlayer, castingItem, 0))
-                            {
-                                doPostCast(pPlayer, castingItem, spell, 0);
-                            }
-                        }
-                        else if (!hasWindup)
-                        {
-                            pPlayer.startUsingItem(pUsedHand);
-                            return InteractionResultHolder.consume(castingItem);
-                        }
-                    }
-                }
-            }
-        }
-
-        return super.use(pLevel, pPlayer, pUsedHand);
-    }
-
-    @Override
-    public void onUseTick(Level pLevel, LivingEntity pLivingEntity, ItemStack pStack, int pRemainingUseDuration)
-    {
-        Spell spell = MagicItemData.getCurrentSpell(pStack);
-
-        if (spell != null)
-        {
-            boolean hasWindup = spell.getWindup() > 0;
-            boolean isContinuous = spell.isContinuous();
-
-            int tick = 72000 - pRemainingUseDuration;
-
-            if (hasWindup)
-            {
-                int windup = spell.getWindup();
-
-
-                if (tick >= windup)
-                {
-                    if (canCast(pLivingEntity, pStack, spell))
-                    {
-                        spell.cast(pLivingEntity, pStack, tick);
-                    }
-
-                    if (!isContinuous)
-                    {
-                        pLivingEntity.stopUsingItem();
-                    }
-                }
-
-            }
-            else
-            {
-                if (canCast(pLivingEntity, pStack, spell))
-                    spell.cast(pLivingEntity, pStack, tick);
-            }
-        }
-
-        super.onUseTick(pLevel, pLivingEntity, pStack, pRemainingUseDuration);
-    }
-
-    @Override
-    public void releaseUsing(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity, int pTimeCharged)
-    {
-        Spell spell = MagicItemData.getCurrentSpell(pStack);
-
-        if (spell != null)
-        {
-            int tick = 72000 - pTimeCharged;
-
-            doPostCast(pLivingEntity, pStack, spell, tick);
-        }
-
-        super.releaseUsing(pStack, pLevel, pLivingEntity, pTimeCharged);
-    }
-
-    @Override
-    public int getUseDuration(ItemStack pStack)
-    {
-        return 72000;
-    }
-
-    @Override
-    public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected)
-    {
-        MagicItemData.decrementCooldowns(pStack);
-
-        super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
-    }
-
-    @SuppressWarnings("RedundantIfStatement")
-    private boolean canCast(LivingEntity caster, ItemStack stack, Spell spell)
-    {
-        if (MagicItemData.getCurrentCooldown(stack) > 0) return false;
-
-        if (MagicEntityData.getFinalCost(caster, spell) > MagicEntityData.getWinds(caster)) return false;
-
-        return true;
-    }
-
-    private void doPostCast(LivingEntity caster, ItemStack stack, Spell spell, int castingTick)
-    {
-        if (spell.cast(caster, stack, castingTick))
-        {
-            int cost = MagicEntityData.getFinalCost(caster, spell);
-            MagicEntityData.subtractWinds(caster, cost);
-
-            int cooldown = MagicEntityData.getFinalCooldown(caster, spell);
-            MagicItemData.addCooldown(stack, MagicItemData.getCurrentSpellIndex(stack), cooldown);
-        }
-    }
-
-    public Tier getTier()
-    {
-        return tier;
-    }
-
-    public Lore getLore()
-    {
-        return lore;
-    }
-
+    void postCast(LivingEntity caster, ItemStack stack, Spell spell, int castingTick, boolean applyCooldown);
 }

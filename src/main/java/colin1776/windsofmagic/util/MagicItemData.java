@@ -1,7 +1,7 @@
 package colin1776.windsofmagic.util;
 
 import colin1776.windsofmagic.init.Spells;
-import colin1776.windsofmagic.item.SpellCastingItem;
+import colin1776.windsofmagic.item.OldStaffItem;
 import colin1776.windsofmagic.spell.Lore;
 import colin1776.windsofmagic.spell.Spell;
 import colin1776.windsofmagic.spell.Tier;
@@ -21,7 +21,7 @@ public class MagicItemData
     // SPELLS
     public static Spell[] getSpells(ItemStack stack)
     {
-        if (stack.getItem() instanceof SpellCastingItem item)
+        if (stack.getItem() instanceof OldStaffItem item)
         {
             Tier tier = item.getTier();
             int numberOfSpells = tier.getNumber();
@@ -48,7 +48,7 @@ public class MagicItemData
 
     public static void addSpell(ItemStack stack, Spell spell, int index)
     {
-        if (stack.getItem() instanceof SpellCastingItem item)
+        if (stack.getItem() instanceof OldStaffItem item)
         {
             Tier tier = item.getTier();
             Lore lore = item.getLore();
@@ -202,7 +202,7 @@ public class MagicItemData
     @SuppressWarnings("ManualArrayCopy")
     public static void addCooldown(ItemStack stack, int index, int cooldownAmount)
     {
-        if (stack.getItem() instanceof SpellCastingItem item)
+        if (stack.getItem() instanceof OldStaffItem item)
         {
             Tier tier = item.getTier();
             int numberOfCooldowns = tier.getNumber();

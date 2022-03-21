@@ -3,6 +3,8 @@ package colin1776.windsofmagic.init;
 import colin1776.windsofmagic.WindsOfMagic;
 import colin1776.windsofmagic.spell.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -34,13 +36,20 @@ public class Spells
 
     public static Spell getSpellFromKey(String key)
     {
-        ResourceLocation resourceLocation = new ResourceLocation(key);
+        ResourceLocation res = new ResourceLocation(key);
 
-        return getSpellRegistry().getValue(resourceLocation);
+        return getSpellRegistry().getValue(res);
     }
 
     public static String getKeyFromSpell(Spell spell)
     {
-        return Objects.requireNonNull(getSpellRegistry().getKey(spell)).toString();
+        ResourceLocation res = getSpellRegistry().getKey(spell);
+
+        return res != null ? res.toString() : empty().toString();
+    }
+
+    public static Spell empty()
+    {
+        return new EmptySpell();
     }
 }

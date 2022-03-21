@@ -1,6 +1,6 @@
 package colin1776.windsofmagic;
 
-import colin1776.windsofmagic.item.SpellCastingItem;
+import colin1776.windsofmagic.item.OldStaffItem;
 import colin1776.windsofmagic.util.KeyboardHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -31,12 +31,12 @@ public class ClientEventHandler
                 ItemStack mainHand = player.getMainHandItem();
                 ItemStack offHand = player.getOffhandItem();
 
-                if (mainHand.getItem() instanceof SpellCastingItem)
+                if (mainHand.getItem() instanceof OldStaffItem)
                 {
                     event.setCanceled(true);
                     cycleSpells(player, mainHand, delta);
                 }
-                else if (offHand.getItem() instanceof SpellCastingItem)
+                else if (offHand.getItem() instanceof OldStaffItem)
                 {
                     event.setCanceled(true);
                     cycleSpells(player, offHand, delta);
