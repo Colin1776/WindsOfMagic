@@ -2,17 +2,26 @@ package colin1776.windsofmagic.util;
 
 import colin1776.windsofmagic.init.Spells;
 import colin1776.windsofmagic.item.SpellCastingItem;
+import colin1776.windsofmagic.spell.Lore;
 import colin1776.windsofmagic.spell.Spell;
+import colin1776.windsofmagic.spell.Tier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import org.lwjgl.system.CallbackI;
 
 public class StaffItemHelper
 {
+    // TODO finish javadocs
+
+    /** Keys for the NBT data */
     private static final String SPELL_SLOT = "spellslot";
     private static final String CURRENT = "current";
     private static final String COOLDOWNS = "cooldowns";
 
+    /**
+     *
+     * @param stack an ItemStack of type {@link colin1776.windsofmagic.item.SpellCastingItem}
+     * @return an array of {@link colin1776.windsofmagic.spell.Spell}(s) bound to the stack
+     */
     public static Spell[] getSpells(ItemStack stack)
     {
         if (stack.getItem() instanceof SpellCastingItem item)
@@ -40,13 +49,38 @@ public class StaffItemHelper
         return new Spell[0];
     }
 
+    /**
+     * This method attempts to "bind" a spell to a casting item. The spell will only
+     * be bound if its tier is not higher than the tier of the casting item, the lore
+     * of the spell matches the lore of the casting item, and the spell is not already
+     * bounded to the casting item.
+     * @param stack an ItemStack of type {@link colin1776.windsofmagic.item.SpellCastingItem}
+     * @param spell a {@link colin1776.windsofmagic.spell.Spell} to be bounded to the stack
+     * @param index the slot the spell is to be bounded to
+     * @return true if the spell was successfully bounded
+     */
     public static boolean setSpell(ItemStack stack, Spell spell, int index)
     {
         Spell[] spells = getSpells(stack);
 
+        if (stack.getItem() instanceof SpellCastingItem item)
+        {
+            Lore itemLore = item.getLore();
+            Tier itemTier = item.getTier();
+
+            Lore spellLore = spell.getLore();
+            Tier spellTier = spell.getTier();
+
+            if (itemLore != Lore.NONE && itemLore != spellLore)
+                return false;
+
+            if (spellTier.getNumber() > itemTier.getNumber())
+                return false;
+        }
+
         if (index >= 0 && index < spells.length)
         {
-            if (spells[index] != spell)
+            if (!containsSpell(stack, spell))
             {
                 String key = SPELL_SLOT + index;
                 String spellKey = Spells.getKeyFromSpell(spell);
@@ -56,6 +90,19 @@ public class StaffItemHelper
 
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public static boolean containsSpell(ItemStack stack, Spell spell)
+    {
+        Spell[] spells = getSpells(stack);
+
+        for (Spell x : spells)
+        {
+            if (spell == x)
+                return true;
         }
 
         return false;
@@ -115,7 +162,41 @@ public class StaffItemHelper
 
     public static void setCooldowns(ItemStack stack, int[] cooldowns)
     {
-          
+        int size = getSpells(stack).length;
+        int[] newCooldowns = new int[size];
+
+        int n = Math.min(cooldowns.length, newCooldowns.length);
+
+        System.arraycopy(cooldowns, 0, newCooldowns, 0, n);
+
+        CompoundTag tag = stack.getOrCreateTag();
+        tag.putIntArray(COOLDOWNS, newCooldowns);
+    }
+
+    public static void addCooldown(ItemStack stack, int cooldown)
+    {
+        int[] cooldowns = getCooldowns(stack);
+        int index = getCurrentIndex(stack);
+
+        if (index < cooldowns.length)
+        {
+            cooldowns[index] = cooldown;
+            setCooldowns(stack, cooldowns);
+        }
+    }
+
+    public static void decrementCooldowns(ItemStack stack)
+    {
+        int[] cooldowns = getCooldowns(stack);
+
+        for (int i = 0; i < cooldowns.length; i++)
+        {
+            int x = cooldowns[i];
+            x--;
+            cooldowns[i] = Math.min(0, x);
+        }
+
+        setCooldowns(stack, cooldowns);
     }
 
     public static int getCurrentCooldown(ItemStack stack)

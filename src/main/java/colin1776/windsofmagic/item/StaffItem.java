@@ -1,15 +1,32 @@
 package colin1776.windsofmagic.item;
 
+import colin1776.windsofmagic.init.Spells;
 import colin1776.windsofmagic.spell.Lore;
 import colin1776.windsofmagic.spell.Spell;
 import colin1776.windsofmagic.spell.Tier;
+import colin1776.windsofmagic.util.KeyboardHelper;
 import colin1776.windsofmagic.util.StaffItemHelper;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class StaffItem extends Item implements SpellCastingItem
 {
+    private static final int USE_DURATION = 72000;
+
     private final Tier tier;
     private final Lore lore;
 
@@ -89,13 +106,13 @@ public class StaffItem extends Item implements SpellCastingItem
     @Override
     public void setCurrentCooldown(ItemStack stack, int cooldown)
     {
-
+        StaffItemHelper.addCooldown(stack, cooldown);
     }
 
     @Override
     public void decrementCooldowns(ItemStack stack)
     {
-
+        StaffItemHelper.decrementCooldowns(stack);
     }
 
     @Override
@@ -109,4 +126,71 @@ public class StaffItem extends Item implements SpellCastingItem
     {
 
     }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand)
+    {
+        if (!pLevel.isClientSide())
+        {
+
+        }
+
+        return super.use(pLevel, pPlayer, pUsedHand);
+    }
+
+    @Override
+    public void onUseTick(Level pLevel, LivingEntity pLivingEntity, ItemStack pStack, int pRemainingUseDuration)
+    {
+        super.onUseTick(pLevel, pLivingEntity, pStack, pRemainingUseDuration);
+    }
+
+    @Override
+    public void releaseUsing(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity, int pTimeCharged)
+    {
+        super.releaseUsing(pStack, pLevel, pLivingEntity, pTimeCharged);
+    }
+
+    @Override
+    public int getUseDuration(ItemStack pStack)
+    {
+        return USE_DURATION;
+    }
+
+    @Override
+    public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected)
+    {
+        if (KeyboardHelper.isHoldingCtrl())
+        {
+            setSpell(pStack, Spells.FIREBALL.get(), 0);
+            setSpell(pStack, Spells.SECOND.get(), 2);
+            setSpell(pStack, Spells.IGNITE.get(), 3);
+            setSpell(pStack, Spells.FIREBALL.get(), 4);
+
+            setCurrentCooldown(pStack, 0);
+        }
+
+        super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced)
+    {
+        Spell[] spells = getSpells(pStack);
+
+        pTooltipComponents.add(new TextComponent(""));
+        pTooltipComponents.add(new TextComponent("Current spell: " + getCurrentSpell(pStack).toString()));
+
+        for (Spell spell : spells)
+        {
+            String name = spell.toString();
+
+            if (getCurrentSpell(pStack) == spell)
+                name = "-> " + name;
+
+            pTooltipComponents.add(new TextComponent(name).withStyle(ChatFormatting.GRAY));
+        }
+
+        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+    }
+
 }
