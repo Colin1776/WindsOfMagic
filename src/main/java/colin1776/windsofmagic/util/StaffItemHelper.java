@@ -11,11 +11,15 @@ import net.minecraft.world.item.ItemStack;
 public class StaffItemHelper
 {
     // TODO finish javadocs
+    // TODO add cooldown and cost reduction bound to staff item
+    // TODO add method to calc final cost and cooldown reduction between these reductions and the ones bound to the entity
 
     /** Keys for the NBT data */
     private static final String SPELL_SLOT = "spellslot";
     private static final String CURRENT = "current";
     private static final String COOLDOWNS = "cooldowns";
+    private static final String COST_REDUC = "costreduction";
+    private static final String COOLDOWN_REDUC = "cooldownreduction";
 
     /**
      *
@@ -252,6 +256,18 @@ public class StaffItemHelper
             return index;
         }
 
+        return 0;
+    }
+
+    // TODO complete this
+    public static int getFinalCost()
+    {
+        return 0;
+    }
+
+    // TODO complete this
+    public static int getFinalCooldown()
+    {
         return 0;
     }
 }

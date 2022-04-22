@@ -5,6 +5,7 @@ import colin1776.windsofmagic.spell.Lore;
 import colin1776.windsofmagic.spell.Spell;
 import colin1776.windsofmagic.spell.Tier;
 import colin1776.windsofmagic.util.KeyboardHelper;
+import colin1776.windsofmagic.util.MagicEntityData;
 import colin1776.windsofmagic.util.StaffItemHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -118,7 +119,11 @@ public class StaffItem extends Item implements SpellCastingItem
     @Override
     public boolean canCast(LivingEntity caster, ItemStack stack, Spell spell)
     {
-        return false;
+        if (StaffItemHelper.getCurrentCooldown(stack) > 0) return false;
+
+        if (StaffItemHelper.getFinalCost() > MagicEntityData.getWinds(caster)) return false;
+
+        return true;
     }
 
     @Override
@@ -127,12 +132,20 @@ public class StaffItem extends Item implements SpellCastingItem
 
     }
 
+    // TODO handle item interaction methods for spell casts of either continuous or non continuous variety, or of windup or non windup variety
+
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand)
     {
         if (!pLevel.isClientSide())
         {
+            ItemStack castingItem = pPlayer.getItemInHand(pUsedHand);
 
+            if (canCast(pPlayer, castingItem, getCurrentSpell(castingItem)))
+            {
+                pPlayer.startUsingItem(pUsedHand);
+                return InteractionResultHolder.success(castingItem);
+            }
         }
 
         return super.use(pLevel, pPlayer, pUsedHand);
@@ -161,13 +174,16 @@ public class StaffItem extends Item implements SpellCastingItem
     {
         if (KeyboardHelper.isHoldingCtrl())
         {
-            setSpell(pStack, Spells.FIREBALL.get(), 0);
+            setSpell(pStack, Spells.ALPHA.get(), 0);
+            setSpell(pStack, Spells.DELTA.get(), 1);
             setSpell(pStack, Spells.SECOND.get(), 2);
             setSpell(pStack, Spells.IGNITE.get(), 3);
             setSpell(pStack, Spells.FIREBALL.get(), 4);
 
             setCurrentCooldown(pStack, 0);
         }
+
+        decrementCooldowns(pStack);
 
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
     }
