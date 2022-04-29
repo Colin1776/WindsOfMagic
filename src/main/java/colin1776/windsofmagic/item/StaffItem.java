@@ -1,6 +1,7 @@
 package colin1776.windsofmagic.item;
 
 import colin1776.windsofmagic.init.Spells;
+import colin1776.windsofmagic.spell.EmptySpell;
 import colin1776.windsofmagic.spell.Lore;
 import colin1776.windsofmagic.spell.Spell;
 import colin1776.windsofmagic.spell.Tier;
@@ -119,6 +120,8 @@ public class StaffItem extends Item implements SpellCastingItem
     @Override
     public boolean canCast(LivingEntity caster, ItemStack stack, Spell spell)
     {
+        if (spell instanceof EmptySpell) return false;
+
         if (StaffItemHelper.getCurrentCooldown(stack) > 0) return false;
 
         if (StaffItemHelper.getFinalCost() > MagicEntityData.getWinds(caster)) return false;
@@ -154,6 +157,37 @@ public class StaffItem extends Item implements SpellCastingItem
     @Override
     public void onUseTick(Level pLevel, LivingEntity pLivingEntity, ItemStack pStack, int pRemainingUseDuration)
     {
+        Spell spell = getCurrentSpell(pStack);
+
+        int windup = spell.getWindup();
+        int tick = USE_DURATION - pRemainingUseDuration;
+
+        if (spell.isContinuous())
+        {
+            if (tick >= windup)
+            {
+                int castingTick = tick - windup;
+
+                if (castingTick == 0 || canCast(pLivingEntity, pStack, spell))
+                {
+                    if (spell.cast(pLivingEntity, pStack, castingTick))
+                    {
+                        // handle cost/cooldown
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (tick == windup)
+            {
+                if (spell.cast(pLivingEntity, pStack, 0))
+                {
+                    // handle cost/cooldown
+                }
+            }
+        }
+
         super.onUseTick(pLevel, pLivingEntity, pStack, pRemainingUseDuration);
     }
 
@@ -208,5 +242,4 @@ public class StaffItem extends Item implements SpellCastingItem
 
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }
-
 }

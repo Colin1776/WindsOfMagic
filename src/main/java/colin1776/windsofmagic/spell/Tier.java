@@ -3,6 +3,8 @@ package colin1776.windsofmagic.spell;
 @SuppressWarnings("unused")
 public enum Tier
 {
+    // TODO rework this, number of spells on staff shouldn't be determined by tier, add fourth tier
+
     BEGINNER("Beginner", 4),
     ADVANCED("Advanced", 5),
     MASTER("Master", 6);

@@ -29,8 +29,7 @@ public class OldStaffItem extends Item
     private final Tier tier;
     private final Lore lore;
 
-    // TODO complete handling for continuous and windup spells
-    // TODO reorganize and cleanup
+    // TODO this is being scrapped for StaffItem
 
     public OldStaffItem(Properties pProperties, Tier tier, Lore lore)
     {

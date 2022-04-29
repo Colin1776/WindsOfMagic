@@ -15,7 +15,7 @@ public class MagicItemData
     private static final String CURRENT_SPELL = "currentspell";
     private static final String COOLDOWNS = "cooldowns";
 
-    // TODO clean this up at a later time
+    // TODO this is being scrapped and replaced by StaffItemHelper
 
 
     // SPELLS

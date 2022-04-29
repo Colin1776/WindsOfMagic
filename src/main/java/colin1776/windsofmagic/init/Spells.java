@@ -19,7 +19,7 @@ public class Spells
 
     /** TEMPORARY DEBUG SPELLS */
     public static final RegistryObject<Spell> ALPHA = SPELLS.register("alpha", () -> new DebugSpell("Alpha", Lore.FIRE, Tier.BEGINNER, Type.UTILITY,
-            30, 100, 0, 30, false));
+            30, 100, 0, 30, true));
     public static final RegistryObject<Spell> DELTA = SPELLS.register("delta", () -> new DebugSpell("Delta", Lore.HEAVENS, Tier.BEGINNER, Type.PROJECTILE,
             50, 80, 0, 40, false));
     public static final RegistryObject<Spell> THETA = SPELLS.register("theta", () -> new DebugSpell("Theta", Lore.ICE, Tier.ADVANCED, Type.UTILITY,
